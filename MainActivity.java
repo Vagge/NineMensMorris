@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.example.ninemensmorris.View.TouchView;
+import com.example.ninemensmorris.View.PhaseOne;
 import com.example.ninemensmorris.View.ViewModel;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity
 
     private void initPhaseOne()
     {
-        TouchView v = new TouchView(vm);
+        PhaseOne v = new PhaseOne(vm, findViewById(R.id.information));
         mRedChecker = findViewById(R.id.red_checker);
         mBlueChecker = findViewById(R.id.blue_checker);
         board = new ArrayList<>();
@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity
         {
             board.add(findViewById(getResources().getIdentifier("pos_"+i,"id", this.getPackageName())));
             board.get(i-1).setOnDragListener(v);
+            board.get(i-1).setOnTouchListener(v);
             board.get(i-1).setContentDescription(Integer.toString(i));
         }
         mRedChecker.setOnTouchListener(v);
