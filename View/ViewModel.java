@@ -42,4 +42,9 @@ public class ViewModel extends AndroidViewModel
     {
         return model.win(color);
     }
+
+    public int board(int from)
+    {
+        return model.board(from);
+    }
 }

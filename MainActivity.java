@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity
 
     private void initPhaseOne()
     {
-        PhaseOne v = new PhaseOne(vm, findViewById(R.id.information));
+        PhaseOne v = new PhaseOne(vm, findViewById(R.id.information), this);
         mRedChecker = findViewById(R.id.red_checker);
         mBlueChecker = findViewById(R.id.blue_checker);
         board = new ArrayList<>();
@@ -45,5 +45,7 @@ public class MainActivity extends AppCompatActivity
         mBlueChecker.setOnTouchListener(v);
         mRedChecker.setOnDragListener(v);
         mBlueChecker.setOnDragListener(v);
+        mBlueChecker.setContentDescription("0");
+        mRedChecker.setContentDescription("0");
     }
 }

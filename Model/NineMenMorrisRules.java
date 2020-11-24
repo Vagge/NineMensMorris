@@ -1,5 +1,7 @@
 package com.example.ninemensmorris.Model;
 
+import android.util.Log;
+
 /**
  * @author Jonas Wåhslén, jwi@kth.se.
  * Revised by Anders Lindström, anderslm@kth.se
@@ -22,6 +24,7 @@ public class NineMenMorrisRules {
     private int[] gameplan;
     private int bluemarker, redmarker;
     private int turn; // player in turn
+    private int PHASE = 1;
 
     public static final int BLUE_MOVES = 1;
     public static final int RED_MOVES = 2;
@@ -32,15 +35,31 @@ public class NineMenMorrisRules {
 
     public NineMenMorrisRules() {
         gameplan = new int[25]; // zeroes
-        bluemarker = 9;
-        redmarker = 9;
+        bluemarker = 8;
+        redmarker = 8;
         turn = RED_MOVES;
+    }
+
+    public void print()
+    {
+        Log.d("tag1", gameplan[3] + " " + gameplan[6] + " " + gameplan[9]);
+        Log.d("tag1", gameplan[2] + " " + gameplan[5] + " " + gameplan[8]);
     }
 
     /**
      * Returns true if a move is successful
      */
-    public boolean legalMove(int To, int From, int color) {
+    public boolean legalMove(int To, int From, int color)
+    {
+        print();
+        if(PHASE == 1 && From != EMPTY_SPACE)
+        {
+            return false;
+        }
+        if(PHASE == 1 && redmarker < 0)
+        {
+            PHASE = 2;
+        }
         if (color == turn) {
             if (turn == RED_MOVES) {
                 if (redmarker >= 0) {
@@ -48,6 +67,10 @@ public class NineMenMorrisRules {
                         gameplan[To] = RED_MARKER;
                         redmarker--;
                         turn = BLUE_MOVES;
+                        if(redmarker<0)
+                        {
+                            PHASE = 2;
+                        }
                         return true;
                     }
                 }
@@ -56,6 +79,7 @@ public class NineMenMorrisRules {
                     boolean valid = isValidMove(To, From);
                     if (valid == true) {
                         gameplan[To] = RED_MARKER;
+                        gameplan[From] = EMPTY_SPACE;
                         turn = BLUE_MOVES;
                         return true;
                     } else {
@@ -77,6 +101,7 @@ public class NineMenMorrisRules {
                     boolean valid = isValidMove(To, From);
                     if (valid == true) {
                         gameplan[To] = BLUE_MARKER;
+                        gameplan[From] = EMPTY_SPACE;
                         turn = RED_MOVES;
                         return true;
                     } else {

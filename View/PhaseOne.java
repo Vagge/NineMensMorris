@@ -1,5 +1,6 @@
 package com.example.ninemensmorris.View;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.graphics.Canvas;
@@ -24,17 +25,23 @@ public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
     private static final int EMPTY_SPACE = 0;
     private static final String INFORMATION_RED_TURN = "Red turn";
     private static final String INFORMATION_BLUE_TURN = "Blue turn";
+    private static final String INFORMATION_BLUE_WIN = "Blue win";
+    private static final String INFORMATION_RED_WIN = "Red turn";
     private static final String REMOVE_CHECKER = "Remove opponents checker!";
     private boolean removable;
     private String TURN = "2";
-    private ViewModel vm;
+    private final ViewModel vm;
     private TextView information;
-    public PhaseOne(ViewModel vm, TextView information)
+    private String PHASE = "1";
+    private String from;
+    private Activity activity;
+    public PhaseOne(ViewModel vm, TextView information, Activity activity)
     {
         this.vm = vm;
         this.information = information;
         information.setText(INFORMATION_RED_TURN);
         removable = false;
+        this.activity = activity;
     }
 
     @Override
@@ -53,7 +60,7 @@ public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
             {
                 toBeRemoved = NineMenMorrisRules.BLUE_MARKER;
             }
-            if(vm.remove(Integer.parseInt(v.getContentDescription().toString()), toBeRemoved))
+             if(vm.remove(Integer.parseInt(v.getContentDescription().toString()), toBeRemoved))
             {
                 ((ImageView)v).setImageResource(R.drawable.ic_action_name);
                 removable = false;
@@ -80,7 +87,8 @@ public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
     }
 
     @Override
-    public boolean onDrag(View v, DragEvent dragEvent) {
+    public boolean onDrag(View v, DragEvent dragEvent)
+    {
         switch(dragEvent.getAction())
         {
             case DragEvent.ACTION_DRAG_STARTED:
@@ -97,24 +105,34 @@ public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
 
             case DragEvent.ACTION_DROP:
                 //if correct turn and valid placement
-                if(dragEvent.getClipData().getItemAt(0).getText().toString().equals(TURN)&&
-                        vm.isValid(Integer.parseInt(((ImageView)v).getContentDescription().toString()), EMPTY_SPACE, Integer.parseInt(dragEvent.getClipData().getItemAt(0).getText().toString())))
-                {
 
+                int from = Integer.parseInt(dragEvent.getClipData().getItemAt(1).getText().toString());
+                if(dragEvent.getClipData().getItemAt(0).getText().toString().equals(TURN)&&  vm.isValid(Integer.parseInt(v.getContentDescription().toString()), from, Integer.parseInt(dragEvent.getClipData().getItemAt(0).getText().toString())))
+                {
                     actionDrop(dragEvent, v);
-                    if(vm.remove(Integer.parseInt(((ImageView)v).getContentDescription().toString())))
+                    if(vm.remove(Integer.parseInt(v.getContentDescription().toString())))
                     {
                         actionRemove(dragEvent, v);
                         return true;
                     }
-                    if(TURN.equals("2"))
+                    if(vm.win(NineMenMorrisRules.BLUE_MARKER))
                     {
-                        TURN = "1";
+                        information.setText(INFORMATION_RED_WIN);
+                        return true;
+                    }
+                    if(vm.win(NineMenMorrisRules.RED_MARKER))
+                    {
+                        information.setText(INFORMATION_RED_WIN);
+                        return true;
+                    }
+                    if(TURN.equals(DATA_TAG_RED))
+                    {
+                        TURN = DATA_TAG_BLUE;
                         information.setText(INFORMATION_BLUE_TURN);
                     }
                     else
                     {
-                        TURN = "2";
+                        TURN = DATA_TAG_RED;
                         information.setText(INFORMATION_RED_TURN);
                     }
                 }
@@ -137,6 +155,11 @@ public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
         else
         {
             ((ImageView)v).setImageResource(R.drawable.blue);
+        }
+        if(!dragEvent.getClipData().getItemAt(1).getText().toString().equals("0"))
+        {
+            ImageView view = (ImageView)activity.findViewById(activity.getResources().getIdentifier("pos_"+dragEvent.getClipData().getItemAt(1).getText().toString(),"id", activity.getPackageName()));
+            view.setImageResource(R.drawable.ic_action_name);
         }
         v.getLayoutParams().height = 100;
         v.getLayoutParams().width = 100;
@@ -169,16 +192,34 @@ public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
 
     private ClipData insertData(View v)
     {
-        ClipData clipData;
+        ClipData clipData = null;
         if(v.getId() == R.id.red_checker)
         {
             ClipData.Item item = new ClipData.Item(DATA_TAG_RED);
+            ClipData.Item from = new ClipData.Item(Integer.toString(EMPTY_SPACE));
             clipData = new ClipData(DATA_TAG_RED, new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }, item);
+            clipData.addItem(from);
         }
-        else
+        else if(v.getId() == R.id.blue_checker)
         {
             ClipData.Item item = new ClipData.Item(DATA_TAG_BLUE);
+            ClipData.Item from = new ClipData.Item(Integer.toString(EMPTY_SPACE));
             clipData = new ClipData(DATA_TAG_BLUE, new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }, item);
+            clipData.addItem(from);
+        }
+        else if(vm.board(Integer.parseInt(v.getContentDescription().toString()))==NineMenMorrisRules.RED_MARKER)
+        {
+            ClipData.Item item = new ClipData.Item(DATA_TAG_RED);
+            ClipData.Item from = new ClipData.Item(v.getContentDescription());
+            clipData = new ClipData(DATA_TAG_RED, new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }, item);
+            clipData.addItem(from);
+        }
+        else if(vm.board(Integer.parseInt(v.getContentDescription().toString()))==NineMenMorrisRules.BLUE_MARKER)
+        {
+            ClipData.Item item = new ClipData.Item(DATA_TAG_BLUE);
+            ClipData.Item from = new ClipData.Item(v.getContentDescription());
+            clipData = new ClipData(DATA_TAG_BLUE, new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }, item);
+            clipData.addItem(from);
         }
         return clipData;
     }
