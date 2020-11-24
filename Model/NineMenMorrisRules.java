@@ -44,6 +44,12 @@ public class NineMenMorrisRules {
     {
         Log.d("tag1", gameplan[3] + " " + gameplan[6] + " " + gameplan[9]);
         Log.d("tag1", gameplan[2] + " " + gameplan[5] + " " + gameplan[8]);
+        Log.d("tag1", gameplan[1] + " " + gameplan[4] + " " + gameplan[7]);
+        Log.d("tag1", gameplan[24] + " " + gameplan[23] + " " + gameplan[22]+" "+gameplan[10] + " " + gameplan[11] + " " + gameplan[12]);
+        Log.d("tag1", gameplan[19] + " " + gameplan[16] + " " + gameplan[13]);
+        Log.d("tag1", gameplan[20] + " " + gameplan[17] + " " + gameplan[14]);
+        Log.d("tag1", gameplan[21] + " " + gameplan[18] + " " + gameplan[15]);
+        Log.d("tag1", "------------");
     }
 
     /**
@@ -51,7 +57,7 @@ public class NineMenMorrisRules {
      */
     public boolean legalMove(int To, int From, int color)
     {
-        print();
+        Log.d("tag1", "from"+From + " to" + To);
         if(PHASE == 1 && From != EMPTY_SPACE)
         {
             return false;
@@ -71,6 +77,7 @@ public class NineMenMorrisRules {
                         {
                             PHASE = 2;
                         }
+                        print();
                         return true;
                     }
                 }
@@ -81,6 +88,7 @@ public class NineMenMorrisRules {
                         gameplan[To] = RED_MARKER;
                         gameplan[From] = EMPTY_SPACE;
                         turn = BLUE_MOVES;
+                        print();
                         return true;
                     } else {
                         return false;
@@ -94,6 +102,7 @@ public class NineMenMorrisRules {
                         gameplan[To] = BLUE_MARKER;
                         bluemarker--;
                         turn = RED_MOVES;
+                        print();
                         return true;
                     }
                 }
@@ -103,6 +112,7 @@ public class NineMenMorrisRules {
                         gameplan[To] = BLUE_MARKER;
                         gameplan[From] = EMPTY_SPACE;
                         turn = RED_MOVES;
+                        print();
                         return true;
                     } else {
                         return false;
@@ -196,6 +206,7 @@ public class NineMenMorrisRules {
                 countMarker++;
             count++;
         }
+        Log.d("Tag2", Integer.toString(countMarker));
         if (bluemarker <= 0 && redmarker <= 0 && countMarker < 3)
             return true;
         else

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.example.ninemensmorris.View.PhaseOne;
@@ -15,9 +16,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
 {
-    private ImageView mRedChecker;
-    private ImageView mBlueChecker;
-    private List<ImageView> board;
     private ViewModel vm;
 
     @Override
@@ -25,27 +23,11 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         vm =  ViewModelProviders.of(this).get(ViewModel.class);
-        initPhaseOne();
+        startGame();
     }
 
-    private void initPhaseOne()
+    private void startGame()
     {
         PhaseOne v = new PhaseOne(vm, findViewById(R.id.information), this);
-        mRedChecker = findViewById(R.id.red_checker);
-        mBlueChecker = findViewById(R.id.blue_checker);
-        board = new ArrayList<>();
-        for(int i = 1; i < 25; i++)
-        {
-            board.add(findViewById(getResources().getIdentifier("pos_"+i,"id", this.getPackageName())));
-            board.get(i-1).setOnDragListener(v);
-            board.get(i-1).setOnTouchListener(v);
-            board.get(i-1).setContentDescription(Integer.toString(i));
-        }
-        mRedChecker.setOnTouchListener(v);
-        mBlueChecker.setOnTouchListener(v);
-        mRedChecker.setOnDragListener(v);
-        mBlueChecker.setOnDragListener(v);
-        mBlueChecker.setContentDescription("0");
-        mRedChecker.setContentDescription("0");
     }
 }

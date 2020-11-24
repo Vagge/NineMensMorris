@@ -12,11 +12,16 @@ import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ninemensmorris.Model.NineMenMorrisRules;
 import com.example.ninemensmorris.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
 
@@ -32,16 +37,62 @@ public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
     private String TURN = "2";
     private final ViewModel vm;
     private TextView information;
-    private String PHASE = "1";
-    private String from;
+    private TextView redMarkers;
+    private TextView blueMarkers;
     private Activity activity;
+    private ImageView mRedChecker;
+    private ImageView mBlueChecker;
+    private List<ImageView> board;
+    private Button newGame;
     public PhaseOne(ViewModel vm, TextView information, Activity activity)
     {
         this.vm = vm;
         this.information = information;
         information.setText(INFORMATION_RED_TURN);
+        redMarkers = activity.findViewById(R.id.red_markers_left);
+        blueMarkers = activity.findViewById(R.id.blue_markers_left);
+        newGame = activity.findViewById(R.id.start_new_game);
         removable = false;
         this.activity = activity;
+        newGame.setOnClickListener(v -> newGame());
+        initGame();
+    }
+
+    private void initGame()
+    {
+        mRedChecker = activity.findViewById(R.id.red_checker);
+        mBlueChecker = activity.findViewById(R.id.blue_checker);
+        board = new ArrayList<>();
+        for(int i = 1; i < 25; i++)
+        {
+            board.add(activity.findViewById(activity.getResources().getIdentifier("pos_"+i,"id", activity.getPackageName())));
+            board.get(i-1).setOnDragListener(this);
+            board.get(i-1).setOnTouchListener(this);
+            board.get(i-1).setContentDescription(Integer.toString(i));
+            board.get(i-1).setImageResource(R.drawable.ic_action_name);
+        }
+        mRedChecker.setOnTouchListener(this);
+        mBlueChecker.setOnTouchListener(this);
+        mRedChecker.setOnDragListener(this);
+        mBlueChecker.setOnDragListener(this);
+        mBlueChecker.setContentDescription("0");
+        mRedChecker.setContentDescription("0");
+        blueMarkers.setText("9");
+        redMarkers.setText("9");
+        vm.newGame();
+    }
+
+    private void newGame()
+    {
+        TURN = "2";
+        information.setText(INFORMATION_RED_TURN);
+        for(int i = 1; i < 25; i++)
+        {
+            board.get(i-1).setImageResource(R.drawable.ic_action_name);
+            blueMarkers.setText("9");
+            redMarkers.setText("9");
+            vm.newGame();
+        }
     }
 
     @Override
@@ -112,17 +163,10 @@ public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
                     actionDrop(dragEvent, v);
                     if(vm.remove(Integer.parseInt(v.getContentDescription().toString())))
                     {
-                        actionRemove(dragEvent, v);
-                        return true;
-                    }
-                    if(vm.win(NineMenMorrisRules.BLUE_MARKER))
-                    {
-                        information.setText(INFORMATION_RED_WIN);
-                        return true;
-                    }
-                    if(vm.win(NineMenMorrisRules.RED_MARKER))
-                    {
-                        information.setText(INFORMATION_RED_WIN);
+                        if(actionRemove(dragEvent, v))//if win
+                        {
+                            newGame();
+                        }
                         return true;
                     }
                     if(TURN.equals(DATA_TAG_RED))
@@ -151,10 +195,20 @@ public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
         if(dragEvent.getClipData().getItemAt(0).getText().toString().equals(DATA_TAG_RED))
         {
             ((ImageView)v).setImageResource(R.drawable.red);
+            int result = 0;
+            result = Integer.parseInt(redMarkers.getText().toString());
+            if(result>0)
+            result = result - 1;
+            redMarkers.setText(Integer.toString(result));
         }
         else
         {
             ((ImageView)v).setImageResource(R.drawable.blue);
+            int result = 0;
+            result = Integer.parseInt(blueMarkers.getText().toString());
+            if(result>0)
+            result = result - 1;
+            blueMarkers.setText(Integer.toString(result));
         }
         if(!dragEvent.getClipData().getItemAt(1).getText().toString().equals("0"))
         {
@@ -224,10 +278,25 @@ public class PhaseOne implements View.OnTouchListener, View.OnDragListener{
         return clipData;
     }
 
-    private void actionRemove(DragEvent dragEvent, View v)
+    private boolean actionRemove(DragEvent dragEvent, View v)
     {
         information.setText(REMOVE_CHECKER);
         removable = true;
+        if(vm.win(NineMenMorrisRules.BLUE_MARKER))
+        {
+            information.setText(INFORMATION_RED_WIN);
+            Toast toast = Toast.makeText(activity, INFORMATION_RED_WIN, Toast.LENGTH_LONG);
+            toast.show();
+            return true;
+        }
+        if(vm.win(NineMenMorrisRules.RED_MARKER))
+        {
+            information.setText(INFORMATION_BLUE_WIN);
+            Toast toast = Toast.makeText(activity, INFORMATION_BLUE_WIN, Toast.LENGTH_LONG);
+            toast.show();
+            return true;
+        }
+        return false;
         //make where u take checkers from onlitsener null so u cant remove them
     }
 }
