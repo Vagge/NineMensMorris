@@ -40,6 +40,14 @@ public class NineMenMorrisRules {
         turn = RED_MOVES;
     }
 
+    public int getBluemarker() {
+        return bluemarker;
+    }
+
+    public int getRedmarker() {
+        return redmarker;
+    }
+
     public void print()
     {
         Log.d("tag1", gameplan[3] + " " + gameplan[6] + " " + gameplan[9]);
