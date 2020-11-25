@@ -9,6 +9,11 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.GestureDetector;
@@ -28,7 +33,7 @@ import com.example.ninemensmorris.SettingsActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewController implements View.OnTouchListener, View.OnDragListener, GestureDetector.OnGestureListener {
+public class ViewController implements View.OnTouchListener, View.OnDragListener, GestureDetector.OnGestureListener, SensorEventListener {
 
     private static final String DATA_TAG_RED = "2";
     private static final String DATA_TAG_BLUE = "1";
@@ -51,6 +56,10 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
     private Button newGame;
     private GestureDetectorCompat mDetector;
     private ImageView boardImage;
+    private SensorManager manager;
+    private float aVal;
+    private float shake;
+    private float aLast;
     public ViewController(ViewModel vm, TextView information, Activity activity)
     {
         this.vm = vm;
@@ -65,7 +74,9 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
         this.activity = activity;
         newGame.setOnClickListener(v -> newGame());
         mDetector = new GestureDetectorCompat(activity, this);
-
+        manager = (SensorManager)activity.getSystemService(activity.SENSOR_SERVICE);
+        manager.registerListener(shakeListener, manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME);
+        shake = 0.00f;
         initGame();
     }
 
@@ -273,6 +284,16 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
         return true;
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
     private static class MyDragShadowBuilder extends View.DragShadowBuilder
     {
         private static Drawable shadow;
@@ -352,4 +373,28 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
         return false;
         //make where u take checkers from onlitsener null so u cant remove them
     }
+
+    private SensorEventListener shakeListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event)
+        {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            aLast = aVal;
+            aVal = (float)Math.sqrt((double)(x*x+y*y+z*z));
+            float delta = aVal - aLast;
+            shake = shake*0.9f + delta;
+            if(shake>12)
+            {
+                newGame();
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        //algorithm for sensorchanged inspired from stackoverflow
+        }
+    };
 }

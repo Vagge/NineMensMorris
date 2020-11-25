@@ -2,6 +2,14 @@ package com.example.ninemensmorris.Model;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.example.ninemensmorris.DataConverter.DataConverter;
+
 /**
  * @author Jonas Wåhslén, jwi@kth.se.
  * Revised by Anders Lindström, anderslm@kth.se
@@ -19,27 +27,87 @@ import android.util.Log;
  * 21           18           15
  *
  */
+@Entity(tableName = "rules_table")
+@TypeConverters({DataConverter.class})
+public class NineMenMorrisRules
+{
+    @PrimaryKey
+    @NonNull
+    private String name;
 
-public class NineMenMorrisRules {
+    public int[] getGameplan() {
+        return gameplan;
+    }
+
+    public void setGameplan(int[] gameplan) {
+        this.gameplan = gameplan;
+    }
+
+    public void setBluemarker(int bluemarker) {
+        this.bluemarker = bluemarker;
+    }
+
+    public void setRedmarker(int redmarker) {
+        this.redmarker = redmarker;
+    }
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+    public int getPHASE() {
+        return PHASE;
+    }
+
+    public void setPHASE(int PHASE) {
+        this.PHASE = PHASE;
+    }
+
     private int[] gameplan;
     private int bluemarker, redmarker;
     private int turn; // player in turn
     private int PHASE = 1;
 
+    @Ignore
     public static final int BLUE_MOVES = 1;
+    @Ignore
     public static final int RED_MOVES = 2;
-
+    @Ignore
     public static final int EMPTY_SPACE = 0;
+    @Ignore
     public static final int BLUE_MARKER = 4;
+    @Ignore
     public static final int RED_MARKER = 5;
+    @Ignore
 
     public NineMenMorrisRules() {
         gameplan = new int[25]; // zeroes
         bluemarker = 8;
         redmarker = 8;
         turn = RED_MOVES;
+        name = "name";
     }
 
+    public NineMenMorrisRules(@NonNull String name, int[] gameplan, int bluemarker, int redmarker, int turn, int PHASE) {
+        this.name = name;
+        this.gameplan = gameplan;
+        this.bluemarker = bluemarker;
+        this.redmarker = redmarker;
+        this.turn = turn;
+        this.PHASE = PHASE;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
     public int getBluemarker() {
         return bluemarker;
     }
