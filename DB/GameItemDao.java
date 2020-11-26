@@ -29,4 +29,10 @@ public interface GameItemDao
 
     @Query("DELETE FROM rules_table WHERE name = :name")
     void deleteRule(String name);
+
+    @Query("DELETE FROM game_item_table")
+    void deleteAllGames();
+
+    @Query("DELETE FROM rules_table")
+    void deleteAllRules();
 }

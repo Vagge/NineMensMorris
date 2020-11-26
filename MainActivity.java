@@ -37,13 +37,11 @@ public class MainActivity extends AppCompatActivity
         vm =  ViewModelProviders.of(this).get(ViewModel.class);
         vm.newGame();
         vm.save();
-        vm.getSavedGamesAsync();
 
         vm.getSavedRules().observe(this, new Observer<List<NineMenMorrisRules>>() {
             @Override
             public void onChanged(List<NineMenMorrisRules> nineMenMorrisRules)
             {
-                Log.d("save", Integer.toString(nineMenMorrisRules.size()));
                 for(int i = 0; i<vm.getSavedGames().getValue().size(); i++)
                 {
                     for(int j = 0; j < vm.getSavedRules().getValue().size(); j++)
@@ -62,6 +60,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+        vm.getSavedGamesAsync();
     }
 
     public void newGame(View view)
@@ -70,6 +69,5 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, GameActivity.class);
         intent.putExtra(EXTRA_REPLY, "newGame");
         startActivity(intent);
-        ViewController v = new ViewController(vm, findViewById(R.id.information), this);
     }
 }

@@ -59,12 +59,11 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
     private SensorManager manager;
     private float aVal;
     private float shake;
-    private float aLast;
-    public ViewController(ViewModel vm, TextView information, Activity activity)
+
+    public ViewController(ViewModel vm, Activity activity)
     {
         this.vm = vm;
-        this.information = information;
-        information.setText(INFORMATION_RED_TURN);
+        this.information = activity.findViewById(R.id.information);
         redMarkers = activity.findViewById(R.id.red_markers_left);
         blueMarkers = activity.findViewById(R.id.blue_markers_left);
         newGame = activity.findViewById(R.id.start_new_game);
@@ -82,6 +81,16 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
 
     private void initGame()
     {
+        vm.print();
+        TURN = Integer.toString(vm.getTurn());
+        if(TURN.equals("2"))
+        {
+            information.setText(INFORMATION_RED_TURN);
+        }
+        else
+        {
+            information.setText(INFORMATION_BLUE_TURN);
+        }
         mRedChecker = activity.findViewById(R.id.red_checker);
         mBlueChecker = activity.findViewById(R.id.blue_checker);
         board = new ArrayList<>();
@@ -91,11 +100,26 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
             board.get(i-1).setOnDragListener(this);
             board.get(i-1).setOnTouchListener(this);
             board.get(i-1).setContentDescription(Integer.toString(i));
-            if(vm.board(i-1) == NineMenMorrisRules.EMPTY_SPACE)
+            if(vm.board(i) == NineMenMorrisRules.EMPTY_SPACE)
             {
                 board.get(i-1).setImageResource(R.drawable.ic_action_name);
             }
-
+            else if(vm.board(i) == NineMenMorrisRules.RED_MARKER)
+            {
+                Log.d("tag1", "i is " + i);
+                Log.d("tag1", "i is " + vm.board(i));
+                board.get(i-1).setImageResource(R.drawable.red);
+                board.get(i-1).getLayoutParams().height = 100;
+                board.get(i-1).getLayoutParams().width = 100;
+                board.get(i-1).requestLayout();
+            }
+            else if(vm.board(i) == NineMenMorrisRules.BLUE_MARKER)
+            {
+                board.get(i-1).setImageResource(R.drawable.blue);
+                board.get(i-1).getLayoutParams().height = 100;
+                board.get(i-1).getLayoutParams().width = 100;
+                board.get(i-1).requestLayout();
+            }
         }
         mRedChecker.setOnTouchListener(this);
         mBlueChecker.setOnTouchListener(this);
@@ -107,7 +131,6 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
         int red = vm.getRedmarker()+1;
         blueMarkers.setText(Integer.toString(blue));
         redMarkers.setText(Integer.toString(red));
-        vm.newGame();
     }
 
     private void newGame()
@@ -126,10 +149,6 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
     @Override
     public boolean onTouch(View v, MotionEvent event)
     {
-        if (this.mDetector.onTouchEvent(event)) {
-            return true;
-        }
-
         View.DragShadowBuilder builder = new MyDragShadowBuilder(v);
         ClipData clipData = insertData(v);
         if(removable)
@@ -164,6 +183,9 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
             {
                 return true;
             }
+        }
+        if (this.mDetector.onTouchEvent(event)) {
+            return true;
         }
         v.startDrag(clipData, builder,null,0);
         return true;
@@ -382,7 +404,7 @@ public class ViewController implements View.OnTouchListener, View.OnDragListener
             float y = event.values[1];
             float z = event.values[2];
 
-            aLast = aVal;
+            float aLast = aVal;
             aVal = (float)Math.sqrt((double)(x*x+y*y+z*z));
             float delta = aVal - aLast;
             shake = shake*0.9f + delta;

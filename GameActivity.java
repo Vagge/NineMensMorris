@@ -36,32 +36,36 @@ public class GameActivity extends AppCompatActivity {
         {
             startGame();
         }
-        vm.getSavedRules().observe(this, new Observer<List<NineMenMorrisRules>>() {
-            @Override
-            public void onChanged(List<NineMenMorrisRules> nineMenMorrisRules)
-            {
-                for(int i = 0; i<vm.getSavedGames().getValue().size(); i++)
+        else
+        {
+            vm.getSavedRules().observe(this, new Observer<List<NineMenMorrisRules>>() {
+                @Override
+                public void onChanged(List<NineMenMorrisRules> nineMenMorrisRules)
                 {
-                    for(int j = 0; j < vm.getSavedRules().getValue().size(); j++)
+                    for(int i = 0; i<vm.getSavedGames().getValue().size(); i++)
                     {
-                        if(vm.getSavedRules().getValue().get(i).getName().equals(vm.getSavedRules().getValue().get(j).getName()))
+                        for(int j = 0; j < vm.getSavedRules().getValue().size(); j++)
                         {
-                            vm.getSavedGames().getValue().get(i).setModel(vm.getSavedRules().getValue().get(j));
-                            if( vm.getSavedGames().getValue().get(i).getName().equals(name))
+                            if(vm.getSavedRules().getValue().get(i).getName().equals(vm.getSavedRules().getValue().get(j).getName()))
                             {
-                                vm.setGame(vm.getSavedGames().getValue().get(i));
-                                startGame();
+                                vm.getSavedGames().getValue().get(i).setModel(vm.getSavedRules().getValue().get(j));
+                                if( vm.getSavedGames().getValue().get(i).getName().equals(name))
+                                {
+                                    vm.setGame(vm.getSavedGames().getValue().get(i));
+                                    startGame();
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
+
     }
 
     public void startGame()
     {
-        ViewController v = new ViewController(vm, findViewById(R.id.information), this);
+        ViewController v = new ViewController(vm, this);
     }
 
     public void save_game(View view)

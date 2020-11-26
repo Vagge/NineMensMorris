@@ -15,6 +15,7 @@ import com.example.ninemensmorris.DB.GameItemDao;
 import com.example.ninemensmorris.Model.GameItem;
 import com.example.ninemensmorris.Model.NineMenMorrisRules;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ViewModel extends AndroidViewModel
@@ -83,6 +84,11 @@ public class ViewModel extends AndroidViewModel
         return  game.getModel().win(color);
     }
 
+    public int getTurn()
+    {
+        return game.getModel().getTurn();
+    }
+
     public int board(int from)
     {
         return  game.getModel().board(from);
@@ -114,6 +120,11 @@ public class ViewModel extends AndroidViewModel
     public void save()
     {
         new save(dao, game).execute();
+    }
+
+    public void print()
+    {
+        this.game.getModel().print();
     }
 
     private static class getSavedGames extends AsyncTask<Void, Void, List<GameItem>>
@@ -156,7 +167,6 @@ public class ViewModel extends AndroidViewModel
                 game.getModel().setName(game.getName());
                 dao.insert(game);
                 dao.insert(game.getModel());
-                Log.d("save", "here");
             }
             catch(SQLiteConstraintException e)
             {
@@ -185,6 +195,25 @@ public class ViewModel extends AndroidViewModel
         @Override
         protected List<NineMenMorrisRules> doInBackground(Void... voids) {
             return dao.getAllRuleItems();
+        }
+    }
+    private static class deleteAll extends AsyncTask<Void, Void, Void>
+    {
+
+        private MutableLiveData<List<NineMenMorrisRules>> savedRules;
+        private GameItemDao dao;
+        deleteAll(GameItemDao dao, MutableLiveData<List<NineMenMorrisRules>> savedRules)
+        {
+            this.savedRules = savedRules;
+            this.dao = dao;
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            dao.deleteAllGames();
+            dao.deleteAllRules();
+            return null;
         }
     }
 }

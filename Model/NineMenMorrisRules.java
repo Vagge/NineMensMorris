@@ -176,6 +176,7 @@ public class NineMenMorrisRules
                 if (bluemarker >= 0) {
                     if (gameplan[To] == EMPTY_SPACE) {
                         gameplan[To] = BLUE_MARKER;
+                        gameplan[From] = EMPTY_SPACE;
                         bluemarker--;
                         turn = RED_MOVES;
                         print();
@@ -282,7 +283,6 @@ public class NineMenMorrisRules
                 countMarker++;
             count++;
         }
-        Log.d("Tag2", Integer.toString(countMarker));
         if (bluemarker <= 0 && redmarker <= 0 && countMarker < 3)
             return true;
         else
