@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Nine mens morris</string>
+    <string name="new_game">New game</string>
+    <string name="type_name">Type Name</string>
+    <string name="save_bt_txt">Save</string>
+    <string name="remove_bt">X</string>
+
+    <string-array name="color_array">
+        <item>#DFFF00</item>
+        <item>#DE3163</item>
+        <item>#CCCCFF</item>
+        <item>#6495ED</item>
+    </string-array>
+</resources>
